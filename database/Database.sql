@@ -1,6 +1,6 @@
 
-CREATE DATABASE examen2;
-USE examen2;
+CREATE DATABASE evaluacion;
+USE evaluacion;
 
 -- Tabla estudiante
 CREATE TABLE estudiante (
@@ -56,7 +56,7 @@ CREATE TABLE alternativa (
     idalternativa INT AUTO_INCREMENT PRIMARY KEY,
     idpregunta INT NOT NULL,
     texto VARCHAR(255) NOT NULL,
-    es_correcta BOOLEAN NOT NULL DEFAULT 0,
+    correcta BOOLEAN NOT NULL,
     FOREIGN KEY (idpregunta) REFERENCES pregunta(idpregunta),
     UNIQUE KEY uq_alternativa_pregunta (idpregunta, texto)
 ) ENGINE=InnoDB;
