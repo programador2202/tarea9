@@ -3,7 +3,7 @@
 // clase de conexión SERVER > BD
 class Database{
   private static $host="localhost";
-  private static $dbname="Inventario";
+  private static $dbname="evaluacion";
   private static $username="root";
 
   private static $password="";
