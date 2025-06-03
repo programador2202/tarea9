@@ -1,7 +1,6 @@
-CREATE DATABASE  examen2;
-USE examen2;
 
-DROP DATABASE examen2;
+CREATE DATABASE examen2;
+USE examen2;
 
 -- Tabla estudiante
 CREATE TABLE estudiante (
@@ -12,7 +11,6 @@ CREATE TABLE estudiante (
     direccion VARCHAR(255) NOT NULL,
     correo VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB;
-
 
 -- Tabla asignaciones
 CREATE TABLE asignaciones (
@@ -38,20 +36,20 @@ CREATE TABLE examen (
     duracion TIME NOT NULL,
     estado ENUM('ACTIVO', 'PENDIENTE') NOT NULL,
     idexamen_asignado INT NOT NULL,
-    FOREIGN KEY (idexamen_asignado) REFERENCES examen_asignado(idexamen_asignado)
+    FOREIGN KEY (idexamen_asignado) REFERENCES examen_asignado(idexamen_asignado),
+    CONSTRAINT uq_examen_asignado_titulo UNIQUE (titulo, idexamen_asignado),
+    UNIQUE KEY uq_examen_asignado_fecha (fecha, idexamen_asignado)
 ) ENGINE=InnoDB;
-
 
 -- Tabla pregunta
 CREATE TABLE pregunta (
     idpregunta INT AUTO_INCREMENT PRIMARY KEY,
     idexamen INT NOT NULL,
-    enunciado TEXT NOT NULL,
-    FOREIGN KEY (idexamen) REFERENCES examen(idexamen)
+    enunciado VARCHAR(500) NOT NULL,
+    imagen VARCHAR(255) DEFAULT NULL,
+    CONSTRAINT fk_pregunta_examen FOREIGN KEY (idexamen) REFERENCES examen(idexamen),
+    UNIQUE KEY uq_pregunta_examen (idexamen, enunciado)
 ) ENGINE=InnoDB;
-
-
-
 
 -- Tabla alternativa
 CREATE TABLE alternativa (
@@ -59,7 +57,8 @@ CREATE TABLE alternativa (
     idpregunta INT NOT NULL,
     texto VARCHAR(255) NOT NULL,
     es_correcta BOOLEAN NOT NULL DEFAULT 0,
-    FOREIGN KEY (idpregunta) REFERENCES pregunta(idpregunta)
+    FOREIGN KEY (idpregunta) REFERENCES pregunta(idpregunta),
+    UNIQUE KEY uq_alternativa_pregunta (idpregunta, texto)
 ) ENGINE=InnoDB;
 
 -- Tabla notas
@@ -68,12 +67,13 @@ CREATE TABLE notas (
     idexamen INT NOT NULL,
     idestudiante INT NOT NULL,
     estado ENUM('APROBADO', 'DESAPROBADO'),
-    nota TINYINT UNSIGNED CHECK (nota BETWEEN 0 AND 20),
+    nota TINYINT UNSIGNED,
     fecha DATETIME NOT NULL,
+    CONSTRAINT chk_nota_valida CHECK (nota BETWEEN 0 AND 20),
     CONSTRAINT fk_notas_examen FOREIGN KEY (idexamen) REFERENCES examen(idexamen),
-    CONSTRAINT fk_notas_estudiante FOREIGN KEY (idestudiante) REFERENCES estudiante(idestudiante)
+    CONSTRAINT fk_notas_estudiante FOREIGN KEY (idestudiante) REFERENCES estudiante(idestudiante),
+    UNIQUE KEY uq_notas_examen_estudiante (idexamen, idestudiante)
 ) ENGINE=InnoDB;
-
 
 -- Tabla historial
 CREATE TABLE historial (
@@ -81,8 +81,9 @@ CREATE TABLE historial (
     idnotas INT NOT NULL,
     idestudiante INT NOT NULL,
     fecha DATETIME NOT NULL,
-    FOREIGN KEY (idnotas) REFERENCES notas(idnotas),
-    FOREIGN KEY (idestudiante) REFERENCES estudiante(idestudiante)
+    CONSTRAINT fk_historial_notas FOREIGN KEY (idnotas) REFERENCES notas(idnotas),
+    CONSTRAINT fk_historial_estudiante FOREIGN KEY (idestudiante) REFERENCES estudiante(idestudiante),
+    UNIQUE KEY uq_historial_notas_estudiante (idnotas, idestudiante, fecha)
 ) ENGINE=InnoDB;
 
 
